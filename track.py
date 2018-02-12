@@ -5,21 +5,45 @@ import argparse
 import cv2
 import smtplib
 
+portfel = False
+telefon = False
+perfuma = False
+kosmetyczka = False
+sluchawki = False
+jablko = False
+
+text = raw_input("Podaj rzeczy, o ktorych nie chcesz zapomniec: ")
+objects = text.split(",")
+for object in objects:
+    if str(object) == 'portfel':
+        portfel = True
+    elif str(object) == 'telefon':
+        telefon = True
+    elif str(object) == 'perfuma':
+        perfuma = True
+    elif str(object) == 'kosmetyczka':
+        kosmetyczka = True
+    elif str(object) == 'sluchawki':
+        sluchawki = True
+    elif str(object) == 'jablko':
+        jablko = True
+
 # define the lower and upper color boundaries
 lower = (100, 051, 000)
 upper = (226, 255, 255)
 
-camera = cv2.VideoCapture(1)
+lower1 = (100, 051, 000)
+upper1 = (226, 255, 255)
 
+camera = cv2.VideoCapture(0)
+
+# set email
 gmail_user = 'kronotification@gmail.com'  
 gmail_password = 'notification2018'
-
 sent_from = gmail_user
 to = 'marietta.siuzdak@gmail.com'
 subject = 'You forgot about something'
 email_text = 'Hey, you forgot to take something from your desk!'
-
-
 
 # keep looping
 while True:
@@ -27,16 +51,22 @@ while True:
     (grabbed, frame) = camera.read()
     if not grabbed:
         break
+    if portfel == True:
+        blurred = cv2.GaussianBlur(frame, (11, 11), 0)
+        hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
+        mask = cv2.inRange(hsv, lower, upper)
+        mask = cv2.erode(mask, np.ones((5,5),np.uint8))
+        mask = cv2.dilate(mask, np.ones((5,5),np.uint8))
 
-    blurred = cv2.GaussianBlur(frame, (11, 11), 0)
-    hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
-
-    mask = cv2.inRange(hsv, lower, upper)
-    mask = cv2.erode(mask, np.ones((5,5),np.uint8))
-    mask = cv2.dilate(mask, np.ones((5,5),np.uint8))
-
-    _, cnts, _ = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    center = None
+        _, cnts, _ = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        center = None
+    
+    #elif telefon == True:
+# to samo dla telefonu
+    #elif perfuma == True:
+    #elif kosmetyczka == True:
+    #elif sluchawki == True:
+    #elif jablko == True:
 
     # only proceed if at least one contour was found
     if len(cnts) > 0:
